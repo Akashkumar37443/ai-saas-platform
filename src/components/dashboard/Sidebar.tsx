@@ -31,7 +31,7 @@ export function Sidebar() {
 
   const SidebarContent = () => (
     <>
-      <div className="flex items-center gap-2 px-6 py-4 border-b border-gray-800">
+      <div className="flex items-center gap-2 pl-16 pr-6 py-4 border-b border-gray-800 md:px-6">
         <Sparkles className="h-8 w-8 text-primary-400" />
         <span className="text-xl font-bold">Admin</span>
       </div>

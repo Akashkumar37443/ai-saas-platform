@@ -1,7 +1,7 @@
 import { Chart } from '@/components/dashboard/Chart'
 import { StatCard } from '@/components/dashboard/StatCard'
 import { Card, CardHeader, CardContent } from '@/components/common/Card'
-
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/common/Table'
 const mockUsageData = [
   { date: 'Week 1', value: 45000 },
   { date: 'Week 2', value: 52000 },
@@ -71,30 +71,28 @@ export default function AnalyticsPage() {
           <h3 className="text-lg font-semibold text-gray-900">Model Usage Breakdown</h3>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Model</th>
-                  <th className="px-6 py-3 text-right text-sm font-medium text-gray-500">Requests</th>
-                  <th className="px-6 py-3 text-right text-sm font-medium text-gray-500">Cost</th>
-                  <th className="px-6 py-3 text-right text-sm font-medium text-gray-500">Avg Cost/Request</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {mockModelData.map((model) => (
-                  <tr key={model.name}>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">{model.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 text-right">{model.requests.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 text-right">${model.cost.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600 text-right">
-                      ${model.requests > 0 ? (model.cost / model.requests).toFixed(4) : '0.0000'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Model</TableHead>
+                <TableHead className="text-right">Requests</TableHead>
+                <TableHead className="text-right">Cost</TableHead>
+                <TableHead className="text-right">Avg Cost/Request</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {mockModelData.map((model) => (
+                <TableRow key={model.name}>
+                  <TableCell className="font-medium">{model.name}</TableCell>
+                  <TableCell className="text-right">{model.requests.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">${model.cost.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">
+                    ${model.requests > 0 ? (model.cost / model.requests).toFixed(4) : '0.0000'}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
