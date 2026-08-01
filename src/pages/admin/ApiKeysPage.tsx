@@ -4,7 +4,7 @@ import { Badge } from '@/components/common/Badge'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import { Card, CardHeader, CardContent } from '@/components/common/Card'
-import { Search, Plus, Copy, Trash2 } from 'lucide-react'
+import { Search, Plus, Copy, Trash2, Key } from 'lucide-react'
 import { formatDate } from '@/utils/format'
 import type { ApiKey } from '@/types'
 
@@ -24,27 +24,33 @@ export default function ApiKeysPage() {
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900">API Keys</h1>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
+            <Key className="h-7 w-7 text-accent-400" />
+            API Keys
+          </h1>
+          <p className="text-sm text-gray-400 mt-1">Create, revoke, and monitor API key usage across the platform</p>
+        </div>
         <Button className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" /> Create New Key
         </Button>
       </div>
 
       <Card>
-        <CardHeader className="pb-4">
+        <CardHeader className="pb-4 border-b border-white/8">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 z-10" />
               <Input
                 placeholder="Search API keys..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -60,8 +66,8 @@ export default function ApiKeysPage() {
             <TableBody>
               {filteredKeys.map((apiKey) => (
                 <TableRow key={apiKey.id}>
-                  <TableCell className="font-medium">{apiKey.name}</TableCell>
-                  <TableCell className="font-mono text-sm">{apiKey.key}</TableCell>
+                  <TableCell className="font-semibold text-white">{apiKey.name}</TableCell>
+                  <TableCell className="font-mono text-sm text-gray-400">{apiKey.key}</TableCell>
                   <TableCell>
                     <Badge variant={apiKey.status === 'active' ? 'success' : 'error'}>
                       {apiKey.status}
@@ -69,26 +75,29 @@ export default function ApiKeysPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="w-24 h-2 bg-white/10 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-primary-500"
-                          style={{ width: `${apiKey.usageLimit > 0 ? (apiKey.currentUsage / apiKey.usageLimit) * 100 : 0}%` }}
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${apiKey.usageLimit > 0 ? (apiKey.currentUsage / apiKey.usageLimit) * 100 : 0}%`,
+                            background: 'linear-gradient(90deg, #6366f1, #a855f7)',
+                          }}
                         />
                       </div>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-xs text-gray-400 font-mono">
                         {apiKey.usageLimit > 0 ? ((apiKey.currentUsage / apiKey.usageLimit) * 100).toFixed(0) : 0}%
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>{apiKey.lastUsed ? formatDate(apiKey.lastUsed) : 'Never'}</TableCell>
-                  <TableCell>{formatDate(apiKey.createdAt)}</TableCell>
+                  <TableCell className="text-gray-400">{apiKey.lastUsed ? formatDate(apiKey.lastUsed) : 'Never'}</TableCell>
+                  <TableCell className="text-gray-400">{formatDate(apiKey.createdAt)}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <button className="p-1 hover:bg-gray-100 rounded">
-                        <Copy className="h-4 w-4 text-gray-500" />
+                    <div className="flex items-center gap-1">
+                      <button className="p-1.5 rounded-lg hover:bg-white/8 text-gray-500 hover:text-white transition-colors">
+                        <Copy className="h-4 w-4" />
                       </button>
-                      <button className="p-1 hover:bg-gray-100 rounded">
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                      <button className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-500 hover:text-red-400 transition-colors">
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </TableCell>

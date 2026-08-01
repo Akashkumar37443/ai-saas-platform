@@ -26,27 +26,30 @@ export default function UsersPage() {
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 md:mb-8">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-900">Users</h1>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Users</h1>
+          <p className="text-sm text-gray-400 mt-1">Manage platform registered accounts and permissions</p>
+        </div>
         <Button className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" /> Add User
         </Button>
       </div>
 
       <Card>
-        <CardHeader className="pb-4">
+        <CardHeader className="pb-4 border-b border-white/8">
           <div className="flex items-center gap-4">
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 z-10" />
               <Input
                 placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 text-sm"
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -61,8 +64,8 @@ export default function UsersPage() {
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
+                  <TableCell className="font-semibold text-white">{user.name}</TableCell>
+                  <TableCell className="text-gray-300">{user.email}</TableCell>
                   <TableCell>
                     <Badge variant={user.role === 'admin' ? 'info' : 'default'}>
                       {user.role}
@@ -73,8 +76,8 @@ export default function UsersPage() {
                       {user.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{user.apiCalls.toLocaleString()}</TableCell>
-                  <TableCell>{formatDate(user.createdAt)}</TableCell>
+                  <TableCell className="text-gray-300 font-mono">{user.apiCalls.toLocaleString()}</TableCell>
+                  <TableCell className="text-gray-400">{formatDate(user.createdAt)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
