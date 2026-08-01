@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, Shield, Sparkles, ArrowRight } from 'lucide-react'
+import { Mail, Lock, Shield, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import { Card, CardContent } from '@/components/common/Card'

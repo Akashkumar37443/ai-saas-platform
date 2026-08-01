@@ -1,4 +1,4 @@
-import { Search, Bell, User, Command } from 'lucide-react'
+import { Search, Bell, User } from 'lucide-react'
 import { Input } from '@/components/common/Input'
 
 export function Header() {

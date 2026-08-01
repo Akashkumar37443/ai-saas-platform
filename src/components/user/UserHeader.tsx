@@ -1,4 +1,4 @@
-import { Bell, User, Search } from 'lucide-react'
+import { Bell, Search } from 'lucide-react'
 import { Input } from '@/components/common/Input'
 
 export function UserHeader() {

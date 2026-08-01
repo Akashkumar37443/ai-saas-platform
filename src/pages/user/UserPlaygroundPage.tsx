@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Card } from '@/components/common/Card'
 import { Button } from '@/components/common/Button'
 import { Badge } from '@/components/common/Badge'
-import { Cpu, Send, Sparkles, Zap, Copy, Check, Terminal } from 'lucide-react'
+import { Cpu, Send, Zap, Copy, Check, Terminal } from 'lucide-react'
 
 const userModels = [
   { id: 'gpt-4o', name: 'GPT-4o', latency: '42ms', tokens: '128k' },

@@ -3,7 +3,7 @@ import { Card, CardHeader, CardContent } from '@/components/common/Card'
 import { Button } from '@/components/common/Button'
 import { Badge } from '@/components/common/Badge'
 import { Input } from '@/components/common/Input'
-import { Key, Plus, Copy, Check, Trash2, Eye } from 'lucide-react'
+import { Key, Plus, Copy, Check, Trash2 } from 'lucide-react'
 
 const initialKeys = [
   { id: '1', name: 'Web Application Key', key: 'sk_live_98a76f...4b21', created: 'Jan 10, 2024', lastUsed: '2 mins ago', status: 'active' },

@@ -1,9 +1,8 @@
-import { useState } from 'react'
 import { Card, CardHeader, CardContent } from '@/components/common/Card'
 import { Button } from '@/components/common/Button'
 import { Badge } from '@/components/common/Badge'
 import { Input } from '@/components/common/Input'
-import { CreditCard, Check, Shield, Download, Zap, Building } from 'lucide-react'
+import { CreditCard, Download, Building } from 'lucide-react'
 
 const invoices = [
   { id: 'INV-2024-001', date: 'Jan 15, 2024', amount: '$49.00', status: 'Paid', plan: 'Pro Plan' },
@@ -12,7 +11,6 @@ const invoices = [
 ]
 
 export default function BillingPage() {
-  const [selectedPlan, setSelectedPlan] = useState('Pro')
 
   return (
     <div className="space-y-8">

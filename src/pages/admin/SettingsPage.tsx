@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { Card, CardHeader, CardContent } from '@/components/common/Card'
+import { Card } from '@/components/common/Card'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
-import { Settings, Shield, Bell, Key, Database, Save, Check } from 'lucide-react'
+import { Settings, Shield, Database, Save, Check } from 'lucide-react'
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false)
