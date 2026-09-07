@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: ai-saas-platform-backend
+    env: docker
+    rootDir: backend
+    plan: free
+    autoDeploy: true
