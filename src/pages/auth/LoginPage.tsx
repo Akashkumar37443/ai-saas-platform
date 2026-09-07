@@ -1,29 +1,49 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, Sparkles, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/common/Button'
-import { Input } from '@/components/common/Input'
-import { Card, CardContent } from '@/components/common/Card'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, Sparkles, ArrowRight, Eye, EyeOff, Zap, Shield } from 'lucide-react';
+import { Button } from '@/components/common/Button';
+import { Card, CardContent } from '@/components/common/Card';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('user@example.com');
+  const [password, setPassword] = useState('user123');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { login, demoLogin } = useAuth();
+  const { success, error } = useToast();
+  const navigate = useNavigate();
 
-  const handleFillDemo = () => {
-    setEmail('user@example.com')
-    setPassword('user1234')
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      success('Welcome back!', 'Signed into Developer AI Studio.');
+      navigate('/dashboard');
+    } catch (err: any) {
+      error('Login failed', err.message || 'Please check your email and password.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Save user token and navigate specifically to user dashboard (/dashboard)
-    localStorage.setItem('userToken', 'user-jwt-token')
-    navigate('/dashboard')
-  }
+  const handle1ClickDemo = async (role: 'user' | 'admin') => {
+    setIsLoading(true);
+    try {
+      await demoLogin(role);
+      success(`Signed in as Demo ${role === 'admin' ? 'Admin' : 'User'}`);
+      navigate(role === 'admin' ? '/admin' : '/dashboard');
+    } catch (err: any) {
+      error('Demo login failed', err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Background Orbs */}
       <div className="absolute inset-0 pointer-events-none">
         <div
@@ -37,89 +57,111 @@ export default function LoginPage() {
         <div className="absolute inset-0 grid-bg opacity-30" />
       </div>
 
-      <div className="max-w-md w-full relative z-10">
-        <div className="text-center mb-8">
+      <div className="max-w-md w-full relative z-10 space-y-6">
+        {/* Brand Header */}
+        <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-4 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary-500 rounded-lg blur-md opacity-60" />
-              <div className="relative bg-gradient-to-br from-primary-500 to-accent-500 p-2 rounded-xl">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 rounded-2xl shadow-lg shadow-indigo-500/25">
+              <Sparkles className="h-6 w-6 text-white" />
             </div>
-            <span className="font-bold text-2xl text-white">
+            <span className="font-extrabold text-2xl text-white tracking-tight">
               AI<span className="gradient-text">Platform</span>
             </span>
           </Link>
-          <h2 className="text-3xl font-extrabold text-white">User Sign in</h2>
-          <p className="text-gray-400 mt-2">Welcome back! Sign in to access your AI developer portal.</p>
+          <h2 className="text-3xl font-black text-white tracking-tight">User Sign In</h2>
+          <p className="text-gray-400 mt-2 text-xs sm:text-sm">
+            Sign in to access your Developer AI Studio & API credentials.
+          </p>
         </div>
 
-        {/* Quick Demo User Box */}
-        <div className="mb-4 p-4 rounded-xl border border-primary-500/30 bg-primary-500/10 backdrop-blur-md flex items-center justify-between">
+        {/* 1-Click Fast Demo Login */}
+        <div className="p-4 rounded-2xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-xl flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold text-primary-300 uppercase tracking-wider">Demo User Credentials</div>
-            <div className="text-sm text-gray-300 font-mono">user@example.com / user1234</div>
+            <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider">Demo Credentials</div>
+            <div className="text-[11px] text-gray-300 font-mono mt-0.5">user@example.com / user123</div>
           </div>
           <button
-            type="button"
-            onClick={handleFillDemo}
-            className="text-xs bg-primary-600 hover:bg-primary-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors shadow-glow"
+            onClick={() => handle1ClickDemo('user')}
+            className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-md flex items-center gap-1"
           >
-            Auto-fill
+            <Zap className="h-3.5 w-3.5 text-yellow-300" />
+            1-Click Login
           </button>
         </div>
 
-        <Card className="glass-card border-white/10">
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form Card */}
+        <Card className="p-7 sm:p-8 backdrop-blur-2xl border-white/10 bg-white/[0.02]">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
+                Email Address
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 z-10" />
-                <Input
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <input
                   type="email"
-                  placeholder="Email address"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-11"
-                  required
+                  placeholder="name@example.com"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/10 bg-white/5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 z-10" />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-11"
-                  required
-                />
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded border-white/20 bg-white/5" />
-                  <span className="text-gray-400">Remember me</span>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Password
                 </label>
-                <Link to="#" className="text-primary-400 hover:text-primary-300">
+                <Link to="/contact" className="text-xs text-indigo-400 hover:underline">
                   Forgot password?
                 </Link>
               </div>
-              <Button type="submit" className="w-full justify-center group" size="lg">
-                Sign in to Developer Portal
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-400 text-sm">
-                Don&apos;t have an account?{' '}
-                <Link to="/register" className="text-primary-400 hover:text-primary-300 font-medium">
-                  Sign up
-                </Link>
-              </p>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl border border-white/10 bg-white/5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
-          </CardContent>
+
+            <Button type="submit" size="lg" className="w-full !mt-6 shadow-xl shadow-indigo-500/20" isLoading={isLoading}>
+              Sign In to Studio <ArrowRight className="h-4 w-4 ml-1.5" />
+            </Button>
+          </form>
+
+          <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
+            <span>Don't have an account?</span>
+            <Link to="/register" className="font-semibold text-indigo-400 hover:text-indigo-300">
+              Create an account →
+            </Link>
+          </div>
         </Card>
+
+        {/* Switch to Admin Login */}
+        <div className="text-center">
+          <Link
+            to="/admin/login"
+            className="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-purple-300 transition"
+          >
+            <Shield className="h-3.5 w-3.5 text-purple-400" />
+            Are you a platform administrator? <strong className="text-white">Admin Login</strong>
+          </Link>
+        </div>
       </div>
     </div>
-  )
+  );
 }

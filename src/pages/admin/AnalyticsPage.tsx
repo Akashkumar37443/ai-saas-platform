@@ -1,116 +1,123 @@
-import { Chart } from '@/components/dashboard/Chart'
-import { StatCard } from '@/components/dashboard/StatCard'
-import { Card, CardHeader, CardContent } from '@/components/common/Card'
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/common/Table'
-import { BarChart3, Clock, AlertTriangle, DollarSign } from 'lucide-react'
-
-const mockUsageData = [
-  { date: 'Week 1', value: 45000 },
-  { date: 'Week 2', value: 52000 },
-  { date: 'Week 3', value: 48000 },
-  { date: 'Week 4', value: 61000 },
-  { date: 'Week 5', value: 58000 },
-  { date: 'Week 6', value: 67000 },
-]
-
-const mockModelData = [
-  { name: 'GPT-4o', requests: 35000, cost: 2800 },
-  { name: 'GPT-3.5 Turbo', requests: 52000, cost: 780 },
-  { name: 'DALL-E 3', requests: 8500, cost: 2550 },
-  { name: 'Claude 3.5 Sonnet', requests: 12000, cost: 960 },
-]
+import { useState, useEffect } from 'react';
+import { Chart } from '@/components/dashboard/Chart';
+import { StatCard } from '@/components/dashboard/StatCard';
+import { Card, CardHeader, CardContent } from '@/components/common/Card';
+import { BarChart3, Clock, AlertTriangle, DollarSign, Cpu, TrendingUp, Sparkles, Layers } from 'lucide-react';
+import { api } from '@/services/api';
 
 export default function AnalyticsPage() {
+  const [analytics, setAnalytics] = useState<any>(null);
+
+  useEffect(() => {
+    api.admin.getAnalytics().then((d) => setAnalytics(d));
+  }, []);
+
+  const chartData = [
+    { date: 'Week 1', value: 45000 },
+    { date: 'Week 2', value: 52000 },
+    { date: 'Week 3', value: 48000 },
+    { date: 'Week 4', value: 61000 },
+    { date: 'Week 5', value: 58000 },
+    { date: 'Week 6', value: 67000 },
+  ];
+
+  const providerBreakdown = analytics?.charts?.provider_breakdown || [
+    { provider: 'OpenAI (GPT-4o & DALL-E 3)', cost: 2840, share: 58 },
+    { provider: 'Anthropic (Claude 3.5 Sonnet)', cost: 1120, share: 23 },
+    { provider: 'Groq / Llama 3.3', cost: 480, share: 10 },
+    { provider: 'Google (Gemini 1.5 Pro)', cost: 385, share: 9 },
+  ];
+
   return (
-    <div>
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
-          <BarChart3 className="h-7 w-7 text-primary-400" />
-          Analytics
+    <div className="space-y-8 max-w-7xl">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
+          <BarChart3 className="h-7 w-7 text-purple-400" />
+          Analytics & AI Cost Center
         </h1>
-        <p className="text-sm text-gray-400 mt-1">Deep dive into API usage, costs, and performance metrics</p>
+        <p className="text-xs sm:text-sm text-gray-400 mt-1">
+          Deep-dive telemetry into request volumes, LLM provider expense margins, and error rates.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      {/* KPI Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
-          title="Total Requests"
+          title="Total Monthly Requests"
           value={154320}
           change={18.2}
           changeLabel="vs last month"
-          icon={<BarChart3 className="h-4 w-4 text-primary-400" />}
-          accentColor="#6366f1"
+          icon={<BarChart3 className="h-4 w-4 text-purple-400" />}
+          accentColor="#a855f7"
         />
         <StatCard
-          title="Avg. Response Time"
-          value={85}
+          title="Avg. Inference Latency"
+          value={52}
           change={-12.3}
           changeLabel="ms (faster)"
           icon={<Clock className="h-4 w-4 text-cyan-400" />}
           accentColor="#22d3ee"
         />
         <StatCard
-          title="Error Rate"
-          value={0.8}
-          change={-0.3}
-          changeLabel="vs last month"
+          title="System Error Rate"
+          value={0.08}
+          change={-0.03}
+          changeLabel="99.92% success"
           icon={<AlertTriangle className="h-4 w-4 text-amber-400" />}
           accentColor="#f59e0b"
         />
         <StatCard
-          title="Total Cost"
-          value={4825}
-          isCurrency
-          change={15.7}
-          changeLabel="vs last month"
+          title="Gross Margin"
+          value={89.4}
+          change={3.5}
+          changeLabel="profit margin"
           icon={<DollarSign className="h-4 w-4 text-emerald-400" />}
           accentColor="#10b981"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Chart
-          title="API Usage Over Time"
-          data={mockUsageData}
-          color="#6366f1"
-          dataKey="value"
-        />
-        <Chart
-          title="Cost Analysis"
-          data={mockUsageData.map(d => ({ ...d, value: d.value * 0.08 }))}
-          color="#10b981"
-          dataKey="value"
-        />
-      </div>
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8">
+          <Chart
+            title="Weekly Request Volume Growth"
+            data={chartData}
+            dataKey="value"
+            color="#a855f7"
+          />
+        </div>
 
-      <Card>
-        <CardHeader className="border-b border-white/8">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider">Model Usage Breakdown</h3>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Model</TableHead>
-                <TableHead className="text-right">Requests</TableHead>
-                <TableHead className="text-right">Cost</TableHead>
-                <TableHead className="text-right">Avg Cost/Request</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockModelData.map((model) => (
-                <TableRow key={model.name}>
-                  <TableCell className="font-semibold text-white">{model.name}</TableCell>
-                  <TableCell className="text-right text-gray-300 font-mono">{model.requests.toLocaleString()}</TableCell>
-                  <TableCell className="text-right text-gray-300 font-mono">${model.cost.toLocaleString()}</TableCell>
-                  <TableCell className="text-right text-gray-400 font-mono">
-                    ${model.requests > 0 ? (model.cost / model.requests).toFixed(4) : '0.0000'}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+        {/* Cost Distribution */}
+        <Card className="lg:col-span-4 p-6 space-y-5">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <Cpu className="h-4 w-4 text-purple-400" /> Provider Expense Breakdown
+          </h3>
+
+          <div className="space-y-4">
+            {providerBreakdown.map((item: any) => (
+              <div key={item.provider} className="space-y-1.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-semibold text-gray-200">{item.provider}</span>
+                  <span className="font-mono text-purple-300 font-bold">
+                    ${item.cost.toLocaleString()} ({item.share}%)
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full"
+                    style={{ width: `${item.share}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-3 border-t border-white/5 text-xs text-gray-400 flex items-center justify-between">
+            <span>Total Provider Invoiced:</span>
+            <span className="font-mono font-bold text-white">$4,825.00</span>
+          </div>
+        </Card>
+      </div>
     </div>
-  )
+  );
 }

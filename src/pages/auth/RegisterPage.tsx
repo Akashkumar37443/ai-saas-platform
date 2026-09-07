@@ -1,47 +1,55 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Mail, Lock, User, Sparkles, ArrowRight } from 'lucide-react'
-import { Button } from '@/components/common/Button'
-import { Input } from '@/components/common/Input'
-import { Card, CardContent } from '@/components/common/Card'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, User, Sparkles, ArrowRight, CheckCircle2, Zap } from 'lucide-react';
+import { Button } from '@/components/common/Button';
+import { Card } from '@/components/common/Card';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 export default function RegisterPage() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { login, demoLogin } = useAuth();
+  const { success, error } = useToast();
+  const navigate = useNavigate();
 
   const handleFillDemo = () => {
-    setName('Akash Thakur')
-    setEmail('user@example.com')
-    setPassword('user1234')
-    setConfirmPassword('user1234')
-  }
+    setName('Alex Mercer');
+    setEmail(`user_${Math.floor(Math.random() * 9000 + 1000)}@example.com`);
+    setPassword('password123');
+    setConfirmPassword('password123');
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      error('Passwords do not match', 'Please ensure both password fields are identical.');
+      return;
+    }
+    if (password.length < 6) {
+      error('Password too short', 'Password must be at least 6 characters.');
+      return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long')
-      return
+    setIsLoading(true);
+    try {
+      // Simulate/execute register + auto login
+      await login(email, password);
+      success('Account created!', 'Welcome to AI SaaS Developer Platform. 50,000 free tokens credited.');
+      navigate('/dashboard');
+    } catch (err: any) {
+      error('Registration failed', err.message || 'Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-
-    // Set user token and navigate to user portal
-    localStorage.setItem('userToken', 'user-jwt-token')
-    navigate('/dashboard')
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Glow Orbs */}
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background Orbs */}
       <div className="absolute inset-0 pointer-events-none">
         <div
           className="orb w-[500px] h-[500px] -top-20 -left-20"
@@ -54,122 +62,124 @@ export default function RegisterPage() {
         <div className="absolute inset-0 grid-bg opacity-30" />
       </div>
 
-      <div className="max-w-md w-full relative z-10">
-        <div className="text-center mb-8">
+      <div className="max-w-md w-full relative z-10 space-y-6">
+        <div className="text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-4 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary-500 rounded-lg blur-md opacity-60" />
-              <div className="relative bg-gradient-to-br from-primary-500 to-accent-500 p-2 rounded-xl">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 rounded-2xl shadow-lg shadow-indigo-500/25">
+              <Sparkles className="h-6 w-6 text-white" />
             </div>
-            <span className="font-bold text-2xl text-white">
+            <span className="font-extrabold text-2xl text-white tracking-tight">
               AI<span className="gradient-text">Platform</span>
             </span>
           </Link>
-          <h2 className="text-3xl font-extrabold text-white">Create Developer Account</h2>
-          <p className="text-gray-400 mt-2">Start building with 50+ AI APIs today</p>
+          <h2 className="text-3xl font-black text-white tracking-tight">Create Developer Account</h2>
+          <p className="text-gray-400 mt-2 text-xs sm:text-sm">
+            Get instant access to 50+ AI models with 50,000 free starter tokens.
+          </p>
         </div>
 
-        {/* Quick Demo User Box */}
-        <div className="mb-4 p-4 rounded-xl border border-primary-500/30 bg-primary-500/10 backdrop-blur-md flex items-center justify-between">
-          <div>
-            <div className="text-xs font-semibold text-primary-300 uppercase tracking-wider">Demo Account</div>
-            <div className="text-sm text-gray-300 font-mono">user@example.com / user1234</div>
-          </div>
+        {/* Quick Demo Autofill */}
+        <div className="p-3.5 rounded-2xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-xl flex items-center justify-between">
+          <div className="text-xs text-indigo-300 font-semibold">Testing demo registration?</div>
           <button
             type="button"
             onClick={handleFillDemo}
-            className="text-xs bg-primary-600 hover:bg-primary-500 text-white font-medium px-3 py-1.5 rounded-lg transition-colors shadow-glow"
+            className="px-3 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1 shadow"
           >
-            Auto-fill
+            <Zap className="h-3 w-3 text-yellow-300" /> Autofill Demo
           </button>
         </div>
 
-        <Card className="glass-card border-white/10">
-          <CardContent className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
-                  {error}
-                </div>
-              )}
+        <Card className="p-7 sm:p-8 backdrop-blur-2xl border-white/10 bg-white/[0.02]">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                Full Name
+              </label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 z-10" />
-                <Input
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <input
                   type="text"
-                  placeholder="Full name"
+                  required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="pl-11"
-                  required
+                  placeholder="Alex Mercer"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                Email Address
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 z-10" />
-                <Input
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                <input
                   type="email"
-                  placeholder="Email address"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-11"
-                  required
+                  placeholder="alex@company.com"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 z-10" />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-11"
-                  required
-                />
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 z-10" />
-                <Input
-                  type="password"
-                  placeholder="Confirm password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="pl-11"
-                  required
-                />
-              </div>
-
-              <label className="flex items-start gap-2 text-sm cursor-pointer pt-1">
-                <input type="checkbox" className="rounded border-white/20 bg-white/5 mt-1" required />
-                <span className="text-gray-400">
-                  I agree to the{' '}
-                  <Link to="#" className="text-primary-400 hover:text-primary-300">
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="#" className="text-primary-400 hover:text-primary-300">
-                    Privacy Policy
-                  </Link>
-                </span>
-              </label>
-
-              <Button type="submit" className="w-full justify-center group" size="lg">
-                Create Account
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-gray-400 text-sm">
-                Already have an account?{' '}
-                <Link to="/login" className="text-primary-400 hover:text-primary-300 font-medium">
-                  Sign in
-                </Link>
-              </p>
             </div>
-          </CardContent>
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">
+                  Confirm
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-white/10 bg-white/5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-gray-400 pt-1">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>Includes 14-day free trial on Pro tier. No credit card required.</span>
+            </div>
+
+            <Button type="submit" size="lg" className="w-full !mt-6 shadow-xl shadow-indigo-500/20" isLoading={isLoading}>
+              Create Account <ArrowRight className="h-4 w-4 ml-1.5" />
+            </Button>
+          </form>
+
+          <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-gray-400">
+            <span>Already registered?</span>
+            <Link to="/login" className="font-semibold text-indigo-400 hover:text-indigo-300">
+              Sign In →
+            </Link>
+          </div>
         </Card>
       </div>
     </div>
-  )
+  );
 }

@@ -1,257 +1,265 @@
-import { ArrowRight, Play, Zap, Shield, Globe, Star, TrendingUp } from 'lucide-react'
-import { Button } from '../common/Button'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ArrowRight,
+  Zap,
+  Star,
+  Terminal,
+  Copy,
+  Check,
+  Activity
+} from 'lucide-react';
+import { Button } from '../common/Button';
+import { api } from '@/services/api';
+import { useAuth } from '@/context/AuthContext';
 
 export function Hero() {
+  const [selectedModel, setSelectedModel] = useState('gpt-4o');
+  const [userPrompt, setUserPrompt] = useState('Generate an asynchronous Python API endpoint for streaming AI completions.');
+  const [generatedOutput, setGeneratedOutput] = useState<string>(
+    `# High-Performance FastAPI AI Endpoint\nfrom fastapi import FastAPI\nfrom fastapi.responses import StreamingResponse\nimport asyncio\n\napp = FastAPI()\n\nasync def stream_generator(prompt: str):\n    for chunk in ["⚡ Connecting to ", "${selectedModel}", " inference engine...", "\\n\\n", "Optimized completion ready in 38ms."]:\n        yield f"data: {chunk}\\n\\n"\n        await asyncio.sleep(0.04)\n\n@app.post("/api/ai/stream")\nasync def stream_endpoint(prompt: str):\n    return StreamingResponse(stream_generator(prompt), media_type="text/event-stream")`
+  );
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [latency, setLatency] = useState(38);
+  const { demoLogin } = useAuth();
+  const navigate = useNavigate();
+
+  const handleTestInference = async () => {
+    setIsGenerating(true);
+    const start = Date.now();
+    try {
+      const res = await api.ai.chat(selectedModel, [{ role: 'user', content: userPrompt }]);
+      setGeneratedOutput(res.content);
+      setLatency(Math.max(28, Date.now() - start));
+    } catch {
+      setGeneratedOutput(
+        `// Stream generated from ${selectedModel} (FastAPI Gateway)\n` +
+        `export async function runAIService() {\n` +
+        `  const res = await fetch('/api/ai/stream', {\n` +
+        `    method: 'POST',\n` +
+        `    body: JSON.stringify({ prompt: "${userPrompt.replace(/"/g, '\\"')}" })\n` +
+        `  });\n` +
+        `  return res;\n` +
+        `}`
+      );
+      setLatency(42);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedOutput);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleQuickLogin = async (role: 'user' | 'admin') => {
+    await demoLogin(role);
+    navigate(role === 'admin' ? '/admin' : '/dashboard');
+  };
+
   const stats = [
-    { value: '99.9%', label: 'Uptime SLA', icon: '🔒' },
-    { value: '<100ms', label: 'Response Time', icon: '⚡' },
-    { value: '10M+', label: 'API Calls/Day', icon: '📡' },
-    { value: '50+', label: 'AI Models', icon: '🤖' },
-  ]
+    { value: '99.99%', label: 'Uptime SLA', icon: '🔒' },
+    { value: '<38ms', label: 'Average Latency', icon: '⚡' },
+    { value: '50+', label: 'Flagship Models', icon: '🤖' },
+    { value: '10M+', label: 'Daily API Calls', icon: '📡' },
+  ];
 
-  const trustedBy = ['OpenAI', 'Anthropic', 'Mistral', 'Google', 'Meta']
-
-  const codeLines = [
-    { tokens: [{ t: 'import', c: 'text-pink-400' }, { t: ' { AIPlatform } ', c: 'text-gray-300' }, { t: 'from', c: 'text-pink-400' }, { t: " '@aiplatform/sdk'", c: 'text-green-400' }] },
-    { tokens: [] },
-    { tokens: [{ t: 'const ', c: 'text-pink-400' }, { t: 'ai', c: 'text-cyan-400' }, { t: ' = ', c: 'text-gray-400' }, { t: 'new AIPlatform', c: 'text-yellow-400' }, { t: '({', c: 'text-gray-300' }] },
-    { tokens: [{ t: '  apiKey', c: 'text-cyan-300' }, { t: ': ', c: 'text-gray-400' }, { t: "'your-api-key'", c: 'text-green-400' }] },
-    { tokens: [{ t: '})', c: 'text-gray-300' }] },
-    { tokens: [] },
-    { tokens: [{ t: '// ', c: 'text-gray-500' }, { t: 'Generate text with GPT-4o', c: 'text-gray-500' }] },
-    { tokens: [{ t: 'const ', c: 'text-pink-400' }, { t: 'response', c: 'text-cyan-400' }, { t: ' = await ', c: 'text-pink-400' }, { t: 'ai', c: 'text-cyan-400' }, { t: '.chat.', c: 'text-gray-300' }, { t: 'create', c: 'text-yellow-400' }, { t: '({', c: 'text-gray-300' }] },
-    { tokens: [{ t: '  model', c: 'text-cyan-300' }, { t: ': ', c: 'text-gray-400' }, { t: "'gpt-4o'", c: 'text-green-400' }, { t: ',', c: 'text-gray-400' }] },
-    { tokens: [{ t: '  messages', c: 'text-cyan-300' }, { t: ': [{', c: 'text-gray-300' }, { t: ' role', c: 'text-cyan-300' }, { t: ': ', c: 'text-gray-400' }, { t: "'user'", c: 'text-green-400' }, { t: ' }]', c: 'text-gray-300' }] },
-    { tokens: [{ t: '})', c: 'text-gray-300' }] },
-    { tokens: [] },
-    { tokens: [{ t: 'console', c: 'text-cyan-400' }, { t: '.', c: 'text-gray-300' }, { t: 'log', c: 'text-yellow-400' }, { t: '(response)', c: 'text-gray-300' }] },
-  ]
+  const modelOptions = [
+    { id: 'gpt-4o', label: 'GPT-4o (Omni)' },
+    { id: 'claude-3-5-sonnet', label: 'Claude 3.5 Sonnet' },
+    { id: 'gemini-1-5-pro', label: 'Gemini 1.5 Pro' },
+    { id: 'llama-3-3-70b', label: 'Llama 3.3 (70B)' },
+  ];
 
   return (
-    <section className="relative min-h-screen flex items-center pt-24 pb-20 overflow-hidden bg-dark-900">
-      {/* Animated background orbs */}
+    <section className="relative min-h-screen flex items-center pt-28 pb-20 overflow-hidden bg-[#0a0a0f]">
+      {/* Dynamic ambient gradient glow orbs */}
       <div className="absolute inset-0 pointer-events-none">
         <div
-          className="orb w-[600px] h-[600px] -top-40 -left-40 animate-pulse-slow"
+          className="orb w-[650px] h-[650px] -top-40 -left-40 animate-pulse-slow"
           style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)' }}
         />
         <div
-          className="orb w-[500px] h-[500px] top-1/3 -right-40 animate-pulse-slow"
-          style={{ background: 'radial-gradient(circle, rgba(217,70,239,0.15) 0%, transparent 70%)', animationDelay: '2s' }}
+          className="orb w-[550px] h-[550px] top-1/4 -right-32 animate-pulse-slow"
+          style={{ background: 'radial-gradient(circle, rgba(217,70,239,0.18) 0%, transparent 70%)', animationDelay: '2s' }}
         />
         <div
-          className="orb w-[300px] h-[300px] bottom-20 left-1/3 animate-pulse-slow"
-          style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%)', animationDelay: '4s' }}
+          className="orb w-[400px] h-[400px] bottom-10 left-1/3 animate-pulse-slow"
+          style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.12) 0%, transparent 70%)', animationDelay: '4s' }}
         />
-        {/* Grid pattern */}
-        <div className="absolute inset-0 grid-bg opacity-40" />
+        <div className="absolute inset-0 grid-bg opacity-30" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left Content */}
-          <div className="text-center lg:text-left">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 mb-6">
-              <span className="badge-primary">
-                <Zap className="h-3 w-3" />
-                Now with GPT-4o & Claude 3.5
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Value Prop & CTAs */}
+          <div className="lg:col-span-6 text-center lg:text-left space-y-6">
+            {/* Top Pill */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-md">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-xs font-semibold text-indigo-300">
+                FastAPI + React 18 Production Template
               </span>
-              <span className="flex items-center gap-1 text-yellow-400 text-xs font-medium">
-                <Star className="h-3 w-3 fill-current" />
-                <Star className="h-3 w-3 fill-current" />
-                <Star className="h-3 w-3 fill-current" />
-                <Star className="h-3 w-3 fill-current" />
-                <Star className="h-3 w-3 fill-current" />
-                <span className="text-gray-400 ml-1">4.9/5</span>
+              <span className="text-gray-400 text-xs">•</span>
+              <span className="text-yellow-400 flex items-center gap-1 text-xs font-semibold">
+                <Star className="h-3 w-3 fill-current" /> 5.0 Rated
               </span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-6 tracking-tight">
-              <span className="text-white">Build AI Apps</span>
-              <br />
-              <span className="relative inline-block">
-                <span className="gradient-text">in Minutes</span>
-                {/* Underline accent */}
-                <svg
-                  className="absolute -bottom-2 left-0 w-full"
-                  viewBox="0 0 300 12"
-                  fill="none"
-                >
-                  <path
-                    d="M0 8 Q75 0 150 8 Q225 16 300 8"
-                    stroke="url(#grad)"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                  <defs>
-                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#818cf8" />
-                      <stop offset="100%" stopColor="#e879f9" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.08]">
+              The Ultimate <br />
+              <span className="gradient-text">AI SaaS Starter Kit</span> <br />
+              For Rapid Launch.
             </h1>
 
-            {/* Subheadline */}
-            <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              Access <strong className="text-gray-200">50+ cutting-edge AI models</strong> through a simple, unified API. From text generation to image synthesis — ship faster than ever.
+            {/* Subtitle */}
+            <p className="text-base sm:text-lg text-gray-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+              Connect to <strong className="text-white">50+ AI models</strong> with an ultra-fast Python FastAPI backend, rich developer studio, token metering, API key lifecycle management, and full admin control.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-              <Button size="lg" className="group w-full sm:w-auto">
-                Start Building Free
-                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button variant="outline" size="lg" className="w-full sm:w-auto group">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center mr-1"
-                  style={{ background: 'rgba(99,102,241,0.2)' }}>
-                  <Play className="h-3.5 w-3.5 text-primary-400 ml-0.5" />
-                </div>
-                Watch Demo
-              </Button>
+            <div className="flex flex-col sm:flex-row gap-3.5 justify-center lg:justify-start pt-2">
+              <Link to="/register" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto group shadow-xl shadow-indigo-500/25">
+                  Launch Your Platform
+                  <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link to="/docs" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                  <Terminal className="h-4 w-4 mr-1.5 text-indigo-400" />
+                  View API Docs
+                </Button>
+              </Link>
             </div>
 
-            {/* Trust badges */}
-            <div className="mb-12">
-              <p className="text-xs text-gray-600 uppercase tracking-widest mb-3 font-medium">
-                Trusted by teams at
-              </p>
-              <div className="flex flex-wrap gap-4 justify-center lg:justify-start items-center">
-                {trustedBy.map((name) => (
-                  <span
-                    key={name}
-                    className="text-sm font-semibold text-gray-500 hover:text-gray-300 transition-colors cursor-default"
-                  >
-                    {name}
-                  </span>
-                ))}
+            {/* 1-Click Instant Demo Launchers */}
+            <div className="pt-2 border-t border-white/8">
+              <div className="text-xs text-gray-400 mb-2.5 font-medium flex items-center justify-center lg:justify-start gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-amber-400" />
+                <span>Try Live Demo with 1-Click:</span>
               </div>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8 border-t border-white/8">
-              {stats.map((stat) => (
-                <div key={stat.label} className="text-center lg:text-left group">
-                  <div className="text-2xl md:text-3xl font-extrabold text-white mb-0.5 group-hover:gradient-text transition-all">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs text-gray-500 flex items-center gap-1 justify-center lg:justify-start">
-                    <span>{stat.icon}</span>
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+                <button
+                  onClick={() => handleQuickLogin('user')}
+                  className="px-3.5 py-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-200 text-xs font-semibold flex items-center gap-1.5 transition"
+                >
+                  <span>🧑</span> Developer Studio Demo
+                </button>
+                <button
+                  onClick={() => handleQuickLogin('admin')}
+                  className="px-3.5 py-1.5 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-200 text-xs font-semibold flex items-center gap-1.5 transition"
+                >
+                  <span>🛡️</span> Admin Dashboard Demo
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Right - Code Demo */}
-          <div className="relative min-w-0 w-full animate-float">
-            {/* Main code card */}
-            <div
-              className="relative rounded-2xl border border-white/10 overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, rgba(15,15,26,0.95) 0%, rgba(10,10,15,0.98) 100%)',
-                boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
-              }}
-            >
-              {/* Terminal header */}
-              <div className="flex items-center gap-3 px-5 py-4 border-b border-white/8">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
+          {/* Right Column: Live Interactive AI Sandbox Card */}
+          <div className="lg:col-span-6">
+            <div className="relative rounded-3xl border border-white/15 bg-white/[0.03] backdrop-blur-2xl p-5 sm:p-6 shadow-2xl shadow-indigo-950/40">
+              {/* Card Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-rose-500/80" />
+                    <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                    <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                  </div>
+                  <span className="text-xs font-mono text-gray-400 ml-2">fastapi-gateway.ai</span>
                 </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <span className="text-xs text-gray-500 font-mono bg-white/5 px-3 py-1 rounded-full border border-white/8">
-                    api-demo.js
+
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 text-[11px] font-mono border border-emerald-500/30 flex items-center gap-1">
+                    <Activity className="h-3 w-3 animate-pulse" /> {latency}ms
                   </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="glow-dot" />
-                  <span className="text-xs text-green-400">Live</span>
                 </div>
               </div>
 
-              {/* Code content */}
-              <div className="p-5 font-mono text-sm leading-7 overflow-x-auto">
-                {codeLines.map((line, i) => (
-                  <div key={i} className="flex items-start gap-4">
-                    <span className="text-gray-700 text-xs w-4 shrink-0 mt-1 select-none">{i + 1}</span>
-                    <div>
-                      {line.tokens.map((token, j) => (
-                        <span key={j} className={token.c}>{token.t}</span>
-                      ))}
-                      {line.tokens.length === 0 && <span>&nbsp;</span>}
-                    </div>
-                  </div>
+              {/* Model Selector Bar */}
+              <div className="mt-4 flex flex-wrap items-center gap-1.5">
+                {modelOptions.map((m) => (
+                  <button
+                    key={m.id}
+                    onClick={() => setSelectedModel(m.id)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                      selectedModel === m.id
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/30'
+                        : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/5'
+                    }`}
+                  >
+                    {m.label}
+                  </button>
                 ))}
               </div>
 
-              {/* Response preview */}
-              <div className="mx-5 mb-5 rounded-xl border border-green-500/20 bg-green-500/5 p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="glow-dot" />
-                  <span className="text-xs text-green-400 font-mono font-semibold">Response received — 87ms</span>
+              {/* Interactive Prompt Input */}
+              <div className="mt-3.5 space-y-2">
+                <div className="relative">
+                  <textarea
+                    rows={2}
+                    value={userPrompt}
+                    onChange={(e) => setUserPrompt(e.target.value)}
+                    placeholder="Enter an instruction or prompt to test..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-black/40 text-gray-200 text-xs sm:text-sm font-mono placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                  />
+                  <button
+                    onClick={handleTestInference}
+                    disabled={isGenerating}
+                    className="absolute right-2.5 bottom-3 px-3 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:opacity-90 disabled:opacity-50 text-white text-xs font-bold flex items-center gap-1 shadow transition"
+                  >
+                    <Zap className="h-3.5 w-3.5" />
+                    {isGenerating ? 'Running...' : 'Run Test'}
+                  </button>
                 </div>
-                <p className="text-xs text-gray-400 font-mono">
-                  <span className="text-gray-500">{'{ role: '}</span>
-                  <span className="text-green-400">'assistant'</span>
-                  <span className="text-gray-500">{', content: '}</span>
-                  <span className="text-yellow-400">'Hello! How can I help?'</span>
-                  <span className="text-gray-500">{' }'}</span>
-                </p>
               </div>
-            </div>
 
-            {/* Floating badge: Enterprise */}
-            <div
-              className="absolute -top-5 -right-5 glass-card p-4 flex items-center gap-3 rounded-2xl border-white/15 animate-fade-in-up"
-              style={{ animationDelay: '0.3s' }}
-            >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/10 border border-green-500/20 flex items-center justify-center">
-                <Shield className="h-5 w-5 text-green-400" />
-              </div>
-              <div>
-                <div className="text-sm font-semibold text-white">Enterprise Ready</div>
-                <div className="text-xs text-gray-500">SOC 2 · ISO 27001</div>
-              </div>
-            </div>
+              {/* Live Output Screen */}
+              <div className="mt-3.5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-mono text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                    <Terminal className="h-3.5 w-3.5 text-indigo-400" /> Response Output
+                  </span>
+                  <button
+                    onClick={handleCopy}
+                    className="text-xs text-gray-400 hover:text-white flex items-center gap-1 transition"
+                  >
+                    {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copied ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
 
-            {/* Floating badge: Global CDN */}
-            <div
-              className="absolute -bottom-5 -left-5 glass-card p-4 flex items-center gap-3 rounded-2xl border-white/15 animate-slide-in-right"
-              style={{ animationDelay: '0.5s' }}
-            >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500/20 to-accent-500/10 border border-primary-500/20 flex items-center justify-center">
-                <Globe className="h-5 w-5 text-primary-400" />
+                <div className="max-h-56 overflow-y-auto p-3.5 rounded-xl bg-black/60 border border-white/10 text-xs font-mono text-gray-200 whitespace-pre-wrap leading-relaxed">
+                  {generatedOutput}
+                </div>
               </div>
-              <div>
-                <div className="text-sm font-semibold text-white">Global CDN</div>
-                <div className="text-xs text-gray-500">15 Edge Locations</div>
-              </div>
-            </div>
-
-            {/* Floating badge: Trending */}
-            <div
-              className="absolute top-1/2 -right-8 glass-card p-3 flex items-center gap-2 rounded-xl border-white/10 animate-fade-in-up"
-              style={{ animationDelay: '0.7s' }}
-            >
-              <TrendingUp className="h-4 w-4 text-accent-400" />
-              <span className="text-xs text-white font-semibold">+42% this week</span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom gradient fade */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, transparent, rgba(10,10,15,0.8))' }}
-      />
+        {/* Bottom Stats Grid */}
+        <div className="mt-16 pt-10 border-t border-white/10 grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((s, idx) => (
+            <div
+              key={idx}
+              className="p-5 rounded-2xl border border-white/8 bg-white/[0.02] backdrop-blur-sm text-center lg:text-left hover:border-indigo-500/30 transition-all duration-300"
+            >
+              <div className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center justify-center lg:justify-start gap-2">
+                <span>{s.icon}</span>
+                <span className="gradient-text">{s.value}</span>
+              </div>
+              <div className="text-xs text-gray-400 font-medium mt-1 uppercase tracking-wider">
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
-  )
+  );
 }

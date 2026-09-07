@@ -1,228 +1,180 @@
-import { Check, X, Sparkles, Zap } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { Button } from '../common/Button'
-import { cn } from '@/utils/cn'
-
-const tiers = [
-  {
-    name: 'Starter',
-    price: 0,
-    description: 'Perfect for side projects and experimentation',
-    features: [
-      { name: '1,000 API calls/month', included: true },
-      { name: 'GPT-3.5 access', included: true },
-      { name: 'Community support', included: true },
-      { name: 'Basic analytics', included: true },
-      { name: 'GPT-4 access', included: false },
-      { name: 'Image generation', included: false },
-      { name: 'Priority support', included: false },
-      { name: 'Custom models', included: false },
-    ],
-    cta: 'Get Started Free',
-    ctaLink: '/register',
-    highlighted: false,
-    badge: null,
-  },
-  {
-    name: 'Pro',
-    price: 49,
-    description: 'For growing startups and small teams',
-    features: [
-      { name: '50,000 API calls/month', included: true },
-      { name: 'GPT-4o & Claude 3.5', included: true },
-      { name: 'Image generation (DALL-E 3)', included: true },
-      { name: 'Email support', included: true },
-      { name: 'Advanced analytics', included: true },
-      { name: 'Team collaboration', included: true },
-      { name: 'Priority support', included: false },
-      { name: 'Custom models', included: false },
-    ],
-    cta: 'Start Pro Trial',
-    ctaLink: '/register',
-    highlighted: true,
-    badge: 'Most Popular',
-  },
-  {
-    name: 'Enterprise',
-    price: 'Custom',
-    description: 'For large organizations with custom needs',
-    features: [
-      { name: 'Unlimited API calls', included: true },
-      { name: 'All AI models included', included: true },
-      { name: 'Dedicated infrastructure', included: true },
-      { name: '24/7 phone support', included: true },
-      { name: 'Custom model fine-tuning', included: true },
-      { name: 'SLA guarantees', included: true },
-      { name: 'SSO & advanced security', included: true },
-      { name: 'Dedicated account manager', included: true },
-    ],
-    cta: 'Contact Sales',
-    ctaLink: '#',
-    highlighted: false,
-    badge: null,
-  },
-]
+import { useState } from 'react';
+import { Check, X, Sparkles, Zap, Shield, HelpCircle, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '../common/Button';
 
 export function Pricing() {
-  return (
-    <section className="py-28 relative overflow-hidden" id="pricing">
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="orb w-[600px] h-[600px] top-0 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)' }}
-        />
-        <div
-          className="orb w-[400px] h-[400px] bottom-0 left-0"
-          style={{ background: 'radial-gradient(circle, rgba(217,70,239,0.08) 0%, transparent 70%)' }}
-        />
-        <div className="absolute inset-0 grid-bg opacity-20" />
-      </div>
+  const [isAnnual, setIsAnnual] = useState(true);
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section header */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <div className="badge-primary inline-flex mb-4">
-            <Sparkles className="h-3 w-3" />
-            Simple, transparent pricing
+  const tiers = [
+    {
+      name: 'Starter',
+      monthlyPrice: 19,
+      annualPrice: 15,
+      description: 'Ideal for indie hackers and developers building their first AI MVP.',
+      features: [
+        { name: '100,000 Tokens included/mo', included: true },
+        { name: 'GPT-3.5 & Llama 3.3 access', included: true },
+        { name: '3 Active API Keys', included: true },
+        { name: 'Community Discord Support', included: true },
+        { name: 'Standard Analytics Dashboard', included: true },
+        { name: 'GPT-4o & Claude 3.5 Sonnet', included: false },
+        { name: 'DALL-E 3 Image Studio', included: false },
+        { name: 'Custom Fine-Tuning', included: false },
+      ],
+      cta: 'Start Free Trial',
+      highlighted: false,
+      badge: null,
+    },
+    {
+      name: 'Pro',
+      monthlyPrice: 49,
+      annualPrice: 39,
+      description: 'For growing startups requiring flagship reasoning and image generation.',
+      features: [
+        { name: '500,000 Tokens included/mo', included: true },
+        { name: 'GPT-4o, Claude 3.5 & Gemini Pro', included: true },
+        { name: '15 Active API Keys + IP Filtering', included: true },
+        { name: 'DALL-E 3 Image Studio (HD)', included: true },
+        { name: 'Real-time Streaming SSE API', included: true },
+        { name: 'Advanced Token Usage Analytics', included: true },
+        { name: '12-Hour Priority Support', included: true },
+        { name: 'Custom Fine-Tuning SLA', included: false },
+      ],
+      cta: 'Start Pro Plan',
+      highlighted: true,
+      badge: 'Most Popular',
+    },
+    {
+      name: 'Enterprise',
+      monthlyPrice: 199,
+      annualPrice: 159,
+      description: 'For organizations demanding dedicated throughput, SLAs, and fine-tuning.',
+      features: [
+        { name: 'Unlimited Fair-Use Tokens', included: true },
+        { name: 'All 50+ Global AI Models', included: true },
+        { name: 'Unlimited API Keys & Scopes', included: true },
+        { name: 'Dedicated Fast Worker Gateway', included: true },
+        { name: 'Custom Model Fine-Tuning & RAG', included: true },
+        { name: 'SOC2 & HIPAA Compliance Ready', included: true },
+        { name: '1-Hour Dedicated SLA Support', included: true },
+        { name: 'Dedicated Account Engineer', included: true },
+      ],
+      cta: 'Get Enterprise',
+      highlighted: false,
+      badge: 'Maximum Scale',
+    },
+  ];
+
+  return (
+    <section id="pricing" className="py-24 relative bg-[#0a0a0f] border-t border-white/5">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-semibold mb-4">
+            <Zap className="h-3.5 w-3.5" />
+            Transparent Pricing
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-6 tracking-tight">
-            Plans That{' '}
-            <span className="gradient-text">Scale With You</span>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+            Simple Plans for <span className="gradient-text">Every Scale</span>
           </h2>
-          <p className="text-lg text-gray-400">
-            Start free, scale as you grow. No hidden fees, no surprises.
+          <p className="text-gray-400 mt-4 text-base sm:text-lg">
+            Start with our generous free trial. Upgrade or cancel anytime with zero lock-in.
           </p>
 
-          {/* Billing toggle */}
-          <div className="mt-8 inline-flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-5 py-2">
-            <span className="text-sm font-medium text-white">Monthly</span>
-            <div className="w-10 h-5 bg-primary-600 rounded-full flex items-center px-0.5 cursor-pointer">
-              <div className="w-4 h-4 rounded-full bg-white translate-x-5 transition-transform" />
-            </div>
-            <span className="text-sm font-medium text-gray-400">
-              Annual{' '}
-              <span className="badge-success ml-1">Save 20%</span>
-            </span>
+          {/* Billing Cycle Toggle Switch */}
+          <div className="mt-8 inline-flex items-center gap-3 p-1.5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md">
+            <button
+              onClick={() => setIsAnnual(false)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                !isAnnual ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Monthly Billing
+            </button>
+            <button
+              onClick={() => setIsAnnual(true)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all ${
+                isAnnual ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <span>Annual Billing</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+                Save 20%
+              </span>
+            </button>
           </div>
         </div>
 
-        {/* Pricing cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-md mx-auto lg:max-w-none items-start">
-          {tiers.map((tier) => (
-            <div
-              key={tier.name}
-              className={cn(
-                'relative rounded-2xl border transition-all duration-300 overflow-hidden group',
-                tier.highlighted
-                  ? 'border-primary-500/50 lg:scale-105'
-                  : 'border-white/10 hover:border-white/20'
-              )}
-              style={{
-                background: tier.highlighted
-                  ? 'linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(168,85,247,0.08) 50%, rgba(99,102,241,0.04) 100%)'
-                  : 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-                boxShadow: tier.highlighted
-                  ? '0 0 40px rgba(99,102,241,0.15), 0 8px 32px rgba(0,0,0,0.3)'
-                  : '0 8px 32px rgba(0,0,0,0.2)',
-              }}
-            >
-              {/* Popular badge */}
-              {tier.badge && (
-                <div className="absolute -top-px left-1/2 -translate-x-1/2">
-                  <div
-                    className="px-4 py-1.5 text-xs font-bold text-white rounded-b-xl flex items-center gap-1.5"
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}
-                  >
-                    <Zap className="h-3 w-3" />
+        {/* Pricing Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+          {tiers.map((tier) => {
+            const price = isAnnual ? tier.annualPrice : tier.monthlyPrice;
+            return (
+              <div
+                key={tier.name}
+                className={`relative rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 ${
+                  tier.highlighted
+                    ? 'border-2 border-indigo-500 bg-gradient-to-b from-indigo-950/40 via-purple-950/20 to-black shadow-2xl shadow-indigo-500/20 ring-1 ring-indigo-500/50 -translate-y-2'
+                    : 'border border-white/10 bg-white/[0.02] backdrop-blur-xl hover:border-white/20'
+                }`}
+              >
+                {tier.badge && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold shadow-lg shadow-indigo-500/30">
                     {tier.badge}
                   </div>
-                </div>
-              )}
+                )}
 
-              <div className="relative p-8">
-                {/* Tier header */}
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold text-white mb-1">{tier.name}</h3>
-                  <p className="text-sm text-gray-500">{tier.description}</p>
-                </div>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-bold text-white">{tier.name}</h3>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2 min-h-[32px] leading-relaxed">{tier.description}</p>
 
-                {/* Price */}
-                <div className="mb-8">
-                  <div className="flex items-end gap-1">
-                    <span
-                      className={cn(
-                        'text-5xl font-extrabold tracking-tight',
-                        tier.highlighted ? 'gradient-text' : 'text-white'
-                      )}
-                    >
-                      {typeof tier.price === 'number' ? `$${tier.price}` : tier.price}
-                    </span>
-                    {typeof tier.price === 'number' && tier.price > 0 && (
-                      <span className="text-gray-500 mb-2">/month</span>
-                    )}
-                    {tier.price === 0 && (
-                      <span className="text-gray-500 mb-2">forever</span>
+                  <div className="my-6 pb-6 border-b border-white/10">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl sm:text-5xl font-black text-white font-mono">${price}</span>
+                      <span className="text-sm text-gray-400 font-medium">/ month</span>
+                    </div>
+                    {isAnnual && (
+                      <div className="text-[11px] text-emerald-400 font-semibold mt-1">
+                        Billed annually (${price * 12}/yr)
+                      </div>
                     )}
                   </div>
-                  {typeof tier.price === 'number' && tier.price > 0 && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      ${Math.floor(tier.price * 0.8)}/mo billed annually
-                    </p>
-                  )}
+
+                  {/* Feature Checklist */}
+                  <div className="space-y-3 pb-8">
+                    <div className="text-xs font-bold uppercase tracking-wider text-gray-400">Included Features</div>
+                    {tier.features.map((feat, i) => (
+                      <div key={i} className="flex items-start gap-2.5 text-xs text-gray-300">
+                        {feat.included ? (
+                          <Check className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                        ) : (
+                          <X className="h-4 w-4 text-gray-600 shrink-0 mt-0.5" />
+                        )}
+                        <span className={feat.included ? 'text-gray-200' : 'text-gray-500 line-through'}>
+                          {feat.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* CTA */}
-                <Link to={tier.ctaLink}>
+                <Link to="/register" className="w-full block">
                   <Button
                     variant={tier.highlighted ? 'primary' : 'outline'}
-                    className="w-full mb-8 justify-center"
-                    id={`pricing-cta-${tier.name.toLowerCase()}`}
+                    size="lg"
+                    className="w-full shadow-lg"
                   >
-                    {tier.cta}
+                    {tier.cta} <ArrowRight className="h-4 w-4 ml-1.5" />
                   </Button>
                 </Link>
-
-                {/* Divider */}
-                <div className="border-t border-white/8 mb-6" />
-
-                {/* Features list */}
-                <ul className="space-y-3">
-                  {tier.features.map((feature) => (
-                    <li key={feature.name} className="flex items-center gap-3">
-                      {feature.included ? (
-                        <div className="w-5 h-5 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                          <Check className="h-3 w-3 text-emerald-400" />
-                        </div>
-                      ) : (
-                        <div className="w-5 h-5 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                          <X className="h-3 w-3 text-gray-600" />
-                        </div>
-                      )}
-                      <span
-                        className={cn(
-                          'text-sm',
-                          feature.included ? 'text-gray-300' : 'text-gray-600'
-                        )}
-                      >
-                        {feature.name}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-
-        {/* Bottom note */}
-        <p className="text-center text-sm text-gray-600 mt-12">
-          All plans include a 14-day free trial. No credit card required.{' '}
-          <a href="#" className="text-primary-400 hover:text-primary-300 transition-colors">
-            View full comparison →
-          </a>
-        </p>
       </div>
     </section>
-  )
+  );
 }

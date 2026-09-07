@@ -1,163 +1,164 @@
-import { Link } from 'react-router-dom'
-import { Sparkles, Github, Twitter, Linkedin, ArrowUpRight } from 'lucide-react'
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Sparkles, Github, Twitter, Send, CheckCircle2 } from 'lucide-react';
+import { useToast } from '@/context/ToastContext';
 
 export function Footer() {
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
+  const { success } = useToast();
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubscribed(true);
+    success('Subscribed successfully!', 'Thank you for joining our AI developer newsletter.');
+    setEmail('');
+    setTimeout(() => setSubscribed(false), 4000);
+  };
+
   const productLinks = [
-    { name: 'Features', href: '/features' },
-    { name: 'Pricing', href: '/pricing' },
-    { name: 'API Docs', href: '#' },
-    { name: 'Changelog', href: '#' },
-  ]
+    { name: 'Features Matrix', href: '/features' },
+    { name: 'Model Explorer', href: '/#models' },
+    { name: 'Pricing Plans', href: '/pricing' },
+    { name: 'API Documentation', href: '/docs' },
+    { name: 'Contact & Sales', href: '/contact' },
+  ];
 
-  const companyLinks = [
-    { name: 'About', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Careers', href: '#' },
-    { name: 'Contact', href: '#' },
-  ]
+  const portals = [
+    { name: 'Developer AI Studio', href: '/dashboard' },
+    { name: 'API Key Manager', href: '/dashboard/api-keys' },
+    { name: 'Usage Analytics', href: '/dashboard/usage' },
+    { name: 'Admin Dashboard', href: '/admin' },
+    { name: 'Admin Login', href: '/admin/login' },
+  ];
 
-  const resourceLinks = [
-    { name: 'Documentation', href: '#' },
-    { name: 'Guides', href: '#' },
-    { name: 'Community', href: '#' },
-    { name: 'Support', href: '#' },
-  ]
+  const documentation = [
+    { name: 'Quickstart Guide', href: '/docs' },
+    { name: 'FastAPI Architecture', href: '/docs' },
+    { name: 'Streaming SSE Protocol', href: '/docs' },
+    { name: 'Swagger /docs URL', href: 'http://localhost:8000/docs', external: true },
+  ];
 
-  const legalLinks = [
-    { name: 'Privacy', href: '#' },
-    { name: 'Terms', href: '#' },
-    { name: 'Cookie Policy', href: '#' },
-    { name: 'Admin Access', href: '/admin/login' },
-  ]
-
-  const socialLinks = [
-    { name: 'GitHub', icon: Github, href: '#' },
-    { name: 'Twitter', icon: Twitter, href: '#' },
-    { name: 'LinkedIn', icon: Linkedin, href: '#' },
-  ]
-
-  const linkColumns = [
-    { title: 'Product', links: productLinks },
-    { title: 'Company', links: companyLinks },
-    { title: 'Resources', links: resourceLinks },
-    { title: 'Legal', links: legalLinks },
-  ]
+  const legal = [
+    { name: 'Privacy Policy', href: '#' },
+    { name: 'Terms of Service', href: '#' },
+    { name: 'Security Audit', href: '#' },
+    { name: 'Codester Commercial License', href: '#' },
+  ];
 
   return (
-    <footer className="relative overflow-hidden bg-dark-900 border-t border-white/8">
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="orb w-[400px] h-[400px] bottom-0 right-0"
-          style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%)' }}
-        />
-        <div className="absolute inset-0 grid-bg opacity-20" />
-      </div>
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Main grid */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12 mb-16">
-          {/* Brand column */}
-          <div className="col-span-2">
-            <Link to="/" className="flex items-center gap-2.5 mb-5 group w-fit">
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary-500 rounded-lg blur-md opacity-50 group-hover:opacity-70 transition-opacity" />
-                <div className="relative bg-gradient-to-br from-primary-500 to-accent-500 p-1.5 rounded-lg">
-                  <Sparkles className="h-5 w-5 text-white" />
-                </div>
+    <footer className="relative overflow-hidden bg-[#06060a] border-t border-white/10 pt-16 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-16 border-b border-white/10">
+          {/* Brand & Newsletter Column */}
+          <div className="lg:col-span-2 space-y-4">
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/20">
+                <Sparkles className="h-5 w-5" />
               </div>
-              <span className="text-lg font-bold text-white tracking-tight">
+              <span className="text-xl font-extrabold text-white tracking-tight">
                 AI<span className="gradient-text">Platform</span>
               </span>
             </Link>
-
-            <p className="text-sm text-gray-500 mb-6 max-w-xs leading-relaxed">
-              Empowering developers with cutting-edge AI APIs and tools for the next generation of intelligent applications.
+            <p className="text-sm text-gray-400 max-w-sm leading-relaxed">
+              Production-ready AI SaaS starter template built with React 18, TypeScript, TailwindCSS, and Python FastAPI.
             </p>
 
-            {/* Social links */}
-            <div className="flex gap-3 mb-6">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl glass-card border-white/10 flex items-center justify-center text-gray-500 hover:text-white hover:border-primary-500/40 transition-all duration-200"
-                  aria-label={social.name}
+            {/* Newsletter Form */}
+            <form onSubmit={handleSubscribe} className="pt-2 max-w-sm">
+              <div className="text-xs font-semibold text-gray-300 mb-2">Subscribe to AI Product Updates</div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email..."
+                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition flex items-center gap-1 shrink-0"
                 >
-                  <social.icon className="h-4 w-4" />
-                </a>
+                  <Send className="h-3.5 w-3.5" />
+                  Join
+                </button>
+              </div>
+              {subscribed && (
+                <div className="text-[11px] text-emerald-400 mt-1.5 flex items-center gap-1 font-medium">
+                  <CheckCircle2 className="h-3 w-3" /> Subscribed successfully!
+                </div>
+              )}
+            </form>
+          </div>
+
+          {/* Product Links */}
+          <div className="space-y-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-gray-300">Product</div>
+            <ul className="space-y-2">
+              {productLinks.map((l) => (
+                <li key={l.name}>
+                  <Link to={l.href} className="text-xs text-gray-400 hover:text-white transition">
+                    {l.name}
+                  </Link>
+                </li>
               ))}
-            </div>
-
-            {/* Status indicator */}
-            <div className="flex items-center gap-2">
-              <span className="glow-dot" />
-              <span className="text-xs text-gray-500">All systems operational</span>
-              <a href="#" className="text-xs text-primary-500 hover:text-primary-400 flex items-center gap-0.5 transition-colors">
-                Status <ArrowUpRight className="h-2.5 w-2.5" />
-              </a>
-            </div>
+            </ul>
           </div>
 
-          {/* Link columns */}
-          {linkColumns.map((col) => (
-            <div key={col.title}>
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5">
-                {col.title}
-              </h3>
-              <ul className="space-y-3">
-                {col.links.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      to={link.href}
-                      className="text-sm text-gray-500 hover:text-gray-300 transition-colors duration-200 hover:translate-x-0.5 inline-block"
-                    >
-                      {link.name}
+          {/* Portals */}
+          <div className="space-y-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-gray-300">Portals</div>
+            <ul className="space-y-2">
+              {portals.map((l) => (
+                <li key={l.name}>
+                  <Link to={l.href} className="text-xs text-gray-400 hover:text-white transition">
+                    {l.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Documentation & Legal */}
+          <div className="space-y-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-gray-300">Developers & Legal</div>
+            <ul className="space-y-2">
+              {documentation.map((l) => (
+                <li key={l.name}>
+                  {l.external ? (
+                    <a href={l.href} target="_blank" rel="noreferrer" className="text-xs text-indigo-400 hover:underline">
+                      {l.name} ↗
+                    </a>
+                  ) : (
+                    <Link to={l.href} className="text-xs text-gray-400 hover:text-white transition">
+                      {l.name}
                     </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Newsletter strip */}
-        <div className="glass-card border-white/8 rounded-2xl p-6 mb-12 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div>
-            <h4 className="text-white font-semibold mb-1">Stay in the loop</h4>
-            <p className="text-sm text-gray-500">Get the latest AI news and product updates.</p>
+                  )}
+                </li>
+              ))}
+              {legal.map((l) => (
+                <li key={l.name}>
+                  <a href={l.href} className="text-xs text-gray-500 hover:text-gray-300 transition">
+                    {l.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
-          <form className="flex gap-2 w-full md:w-auto" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              className="input-field flex-1 md:w-64 text-sm py-2.5"
-              id="footer-newsletter-email"
-            />
-            <button
-              type="submit"
-              className="px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200 hover:shadow-glow hover:-translate-y-0.5"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}
-            >
-              Subscribe
-            </button>
-          </form>
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-white/8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-gray-600">
-            © {new Date().getFullYear()} AIPlatform Inc. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span>Built with</span>
-            <span className="text-red-500">♥</span>
-            <span>using React + Tailwind</span>
+        {/* Footer Bottom Bar */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+          <div>
+            © {new Date().getFullYear()} AI SaaS Platform. All rights reserved. Ready to sell on Codester.
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-gray-400 font-mono">FastAPI Backend Status: Operational</span>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

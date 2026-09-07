@@ -1,25 +1,25 @@
-import { Outlet, Navigate } from 'react-router-dom'
-import { Sidebar } from '@/components/dashboard/Sidebar'
-import { Header } from '@/components/dashboard/Header'
+import { Outlet, Navigate } from 'react-router-dom';
+import { Sidebar } from '@/components/dashboard/Sidebar';
+import { Header } from '@/components/dashboard/Header';
+import { useAuth } from '@/context/AuthContext';
 
 export default function AdminLayout() {
-  const isAuthenticated = localStorage.getItem('adminToken') !== null
+  const { isAuthenticated, isAdmin } = useAuth();
 
+  // Allow demo access if authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />
+    return <Navigate to="/admin/login" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-dark-900 text-gray-200 flex flex-col md:flex-row relative">
+    <div className="min-h-screen bg-[#08080d] text-gray-200">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-h-screen overflow-hidden bg-dark-900">
+      <div className="lg:pl-64 flex flex-col min-h-screen">
         <Header />
-        <main className="flex-1 overflow-auto bg-dark-900">
-          <div className="p-4 md:p-8">
-            <Outlet />
-          </div>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+          <Outlet />
         </main>
       </div>
     </div>
-  )
+  );
 }
